@@ -1,58 +1,85 @@
-# ------------------------------------------------------------------------------
-# copy this inside the file you want to debug
-
 import os
 import logging
-
-def debug_enable():
-    script_path = os.path.abspath(__file__)
-    script_dir = os.path.dirname(script_path)
-    log_dir = os.path.join(script_dir, 'debug')
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    script_name = os.path.basename(script_path)
-    log_path = os.path.join(log_dir, script_name + '.debug.log')
-    logging.basicConfig(
-        level=logging.DEBUG,
-        filename=log_path,
-        filemode="w",
-        format="%(asctime)s %(message)s"
-    )
+from datetime import datetime
 
 
-def debug_log(description, obj=''):
-    logging.debug("%s %r", description, obj)
+def get_timestamp():
+    now = datetime.now()
+    year = now.year
+    month = f"{now.month:02}"
+    day = f"{now.day:02}"
+    hours = f"{now.hour:02}"
+    minutes = f"{now.minute:02}"
+    seconds = f"{now.second:02}"
+    milliseconds = f"{now.microsecond // 1000:03}"
+    return f"{year}{month}{day}_{hours}{minutes}{seconds}_{milliseconds}"
 
 
+class Debug:
 
-# ------------------------------------------------------------------------------
-# example usage
+    def __init__(self):
 
-import sys
+        # global enable
+        self.enabled = False
 
-def main():
-    simple_object = {
-        "string_property": "Hello, World!",
-        "number_property": 42,
-        "bool_property": True
-    }
-    debug_log('simple_object', simple_object)
-    sys.exit(0)
+        # file path
+        self.path = ''
 
+        # FLAGS options
+        self.terminal_output_enable = False
+        self.terminal_timestamp_enable = False
+        self.file_output_enable = False
+        self.file_timestamp_enable = False
+        self.file_history_enable = False
 
-if __name__ == "__main__":
-    debug_enable() # comment this to disable debugging
-    try:
-        debug_log('starting main()')
-        main()
-    except SystemExit as e:
-        # Reraise the exception to terminate the program with the exit code.
-        debug_log('SystemExit:', e)
-        raise
-    except BaseException as e:
-        # catch SIGTERM, KeyboardInterrupt and other exceptions
-        debug_log('BaseException:', e)
-        sys.exit()
+    def enable(self):
 
+        # globally enable logging
+        self.enabled = True
 
-# ------------------------------------------------------------------------------
+        # set things up for file logging
+        if self.file_output_enable and self.path != '':
+
+            # calculate path directory
+            script_path = os.path.abspath(self.path)
+            script_dir = os.path.dirname(script_path)
+            log_dir = os.path.join(script_dir, 'debug')
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
+
+            # calculate path filename
+            script_name = ''
+            if self.file_history_enable:
+                script_name = get_timestamp() + '_'
+            script_name += os.path.basename(script_path)
+
+            # set path = directory + filename
+            self.path = os.path.join(log_dir, script_name + '.log')
+
+            # create file and enable file logging
+            logging.basicConfig(
+                level=logging.DEBUG,
+                filename=self.path,
+                filemode="w",
+                format="%(message)s"
+            )
+
+    def log(self, description, obj=''):
+
+        # check if disabled
+        if not self.enabled:
+            return
+
+        # log to file if enabled
+        if self.file_output_enable:
+            if self.file_timestamp_enable:
+                logging.debug("%s %s %r", get_timestamp(), description, obj)
+            else:
+                logging.debug("%s %r", description, obj)
+
+        # log to terminal if enabled
+        if self.terminal_output_enable:
+            if self.terminal_timestamp_enable:
+                print(get_timestamp(), description, obj)
+            else:
+                print(description, obj)

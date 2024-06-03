@@ -1,47 +1,123 @@
 # python-debug
 
-This project contains a simple utility to facilitate logging and debugging in your Python scripts.
+Simple log-to-file library for debugging Python scripts.
+
+
+## Why Use This?
+
+Regardless of the fact that logging to a file with precise timestamps can generally be more practical and useful than printing to the screen...
+
+There are times when you need to debug issues:
+- that only manifest during runtime.
+- when access to a debugger isn't available.
+- when halting the process isn't feasible.
+- when the stdout/stderr isn't visible.
+- when dealing with a plug-in or a child process.
+
+In such scenarios, logging to a file can be invaluable.
+
+This repository offers a straightforward logger, complete with detailed timestamps, enabling quick setup for file logging.
+
+This library can also be used for simple terminal printing.  
+It adds the following features:
+- a global switch to disable all debug_log() calls.
+- timestamp to the output (can be easily disabled).
+
+<div style="text-align: right;">
+    <a href="#python-debug">Back to top</a>
+</div>
+
 
 ## Usage
 
-To use this debug utility, follow the steps below:
-
-1. Copy the first part of the `debug.py` script.
-
-2. Paste it into the script you want to debug.
-
-3. Enable debugging by calling `debug_enable()`:
-
-    Call this at the beginning of your script's execution to set up the logging configuration. This will create a `debug` directory in the same location as your script if it doesn't already exist and set up a log file for debugging information.
-
-4. Log debug information using `debug_log()`:
-
-    Use this function to log messages and objects for debugging purposes.
-
-### Example
-
-Here is a simple example demonstrating how to use the debug utility in your script:
-
+1. Copy `debug.py` into your project.
+2. Insert `from debug import Debug` in the `.py` file where you want to use the logging functions.
+3. At the start of your script, Create a new debug object, set the path, set some flags and call debug.enable() like so:
 ```python
-# enable debugging
-debug_enable() # comment this line to disable debugging
+# create debug object
+from debug import Debug
+debug = Debug()
+# set the path to be the same as your script's path
+debug.path = __file__
+# set some flags, See "FLAGS options" below.
+debug.file_output_enable = True
+debug.file_timestamp_enable = True
+# call enable()
+debug.enable()
+```
+4. Every time you need to log something, call `debug.log(DESCRIPTION, SOME_OBJECT)` just like you would call `print(DESCRIPTION, SOME_OBJECT)`.
+5. When you have finished debugging, comment or delete call to enable() like this `# debug.enable();` to disable logging.
+    - No need to comment or delete any `debug.log()` line. Without `debug.enable()`, they will do nothing.
 
-# create a simple object with various properties
-simple_object = {
-    "string_property": "Hello, World!",
-    "number_property": 42,
-    "bool_property": True
-}
+<div style="text-align: right;">
+    <a href="#python-debug">Back to top</a>
+</div>
 
-# log the object
-debug_log('simple_object', simple_object)
+
+## FLAGS options
+
+There are some flags you can use to customize how debug.log() works.
+
+
+### debug.terminal_output_enable
+
+Why forgo terminal output while logging to file?  
+Set this to True in order to see everything you log to file also on the process stdout.
+Do you want to disable this at some point?  
+Simply set it back to False before calling debug.enable().
+
+
+### debug.terminal_timestamp_enable
+
+If you don't want timestamps for every line in your terminal, set this to False.
+
+
+### debug.file_output_enable
+
+Need to disable logging to file?  
+Use this switch to enable (True) or disable (False) file logging.
+
+
+### debug.file_timestamp_enable
+
+If you don't want timestamps for every line in your file, set this to False.
+
+
+### debug.file_history_enable
+
+**debug.file_history_enable = False**: only one file is written and it is overwritten over and over everytime the executable executes.
+```
+root
+├── debug.py
+├── main.py  <-- your script
+└── debug
+    └── main.py.log
 ```
 
-### Customization
+**debug.file_history_enable = True**: it generates a new timestamped file each time the executable is executed. 
+```
+root
+├── debug.py
+├── main.py  <-- your script
+└── debug
+    ├── 20240531_1234_000_main.py.log
+    ├── 20240531_1234_123_main.py.log
+    ├── 20240531_1256_012_main.py.log
+    └── 20240531_1345_987_main.py.log
+```
 
-- **Enable/Disable Debugging:** You can disable debugging by commenting out the `debug_enable()` call in the main execution block.
-- **Log Directory:** Logs are saved in a `debug` directory by default. Modify the `debug_enable` function if you need to change the log directory path.
+<div style="text-align: right;">
+    <a href="#python-debug">Back to top</a>
+</div>
 
-## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## Testing and compiling the example.
+
+- Check `example.py`.
+- Execute it with command `python example.py`.
+- Check the log file that has been written in `debug/` folder.
+- Experiment with the `example.py` file (disable debugging, change FLAGS, log other types of data, etc.).
+
+<div style="text-align: right;">
+    <a href="#python-debug">Back to top</a>
+</div>
