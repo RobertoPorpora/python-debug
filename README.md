@@ -64,7 +64,7 @@ There are some flags you can use to customize how debug.log() works.
 Why forgo terminal output while logging to file?  
 Set this to True in order to see everything you log to file also on the process stdout.
 Do you want to disable this at some point?  
-Simply set it back to False before calling debug.enable().
+Simply set it back to False before calling `debug.enable()`.
 
 
 ### debug.terminal_timestamp_enable
@@ -128,6 +128,8 @@ root
 - [Debug logger for Python.](https://github.com/RobertoPorpora/python-debug)
 - [Debug logger for C/C++.](https://github.com/RobertoPorpora/c-debug)
 - [Debug logger for Node.js.](https://github.com/RobertoPorpora/node-debug)
+- [Debug logger for Rust.](https://github.com/RobertoPorpora/rust-debug)
+
 
 <div style="text-align: right;">
     <a href="#python-debug">Back to top</a>
